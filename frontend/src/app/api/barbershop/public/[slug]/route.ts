@@ -8,12 +8,12 @@ import { allow } from '@/lib/rateLimit'
 import { redis } from '@/lib/redis'
 
 export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ slug: string }> }
+  _req: Request,
+  context: { params: Promise<{ slug: string }> }
 ) {
-  const { slug } = await params
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-           || req.headers.get('x-real-ip') || 'local'
+  const { slug } = await context.params;
+  const ip = _req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+           || _req.headers.get('x-real-ip') || 'local'
 
   const rl = await allow(`${ip}:${slug}`, 60, 60)
   if (!rl.ok) return NextResponse.json({ error: 'Too Many Requests' },
