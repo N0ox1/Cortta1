@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "@prisma/client": "^6.14.0",
+    "@upstash/redis": "^1.35.3",
     "axios": "^1.6.2",
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
