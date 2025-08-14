@@ -308,4 +308,8 @@ const AppointmentConfirmation = () => {
   );
 };
 
+export async function getServerSideProps() {
+  return { props: {} }
+}
+
 export default AppointmentConfirmation; 

@@ -267,4 +267,8 @@ const AdminApprovals = () => {
   );
 };
 
+export async function getServerSideProps() {
+  return { props: {} }
+}
+
 export default AdminApprovals; 

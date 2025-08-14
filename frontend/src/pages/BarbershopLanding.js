@@ -318,4 +318,8 @@ const BarbershopLanding = () => {
   );
 };
 
+export async function getServerSideProps() {
+  return { props: {} }
+}
+
 export default BarbershopLanding; 

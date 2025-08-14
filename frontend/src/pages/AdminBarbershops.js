@@ -425,4 +425,8 @@ const AdminBarbershops = () => {
   );
 };
 
+export async function getServerSideProps() {
+  return { props: {} }
+}
+
 export default AdminBarbershops; 
