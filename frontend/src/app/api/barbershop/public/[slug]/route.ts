@@ -7,8 +7,11 @@ import { prisma } from '@/lib/db'
 import { allow } from '@/lib/rateLimit'
 import { redis } from '@/lib/redis'
 
-export async function GET(req: Request, { params }: { params: { slug: string } }) {
-  const { slug } = params
+export async function GET(
+  req: Request,
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  const { slug } = await params
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
            || req.headers.get('x-real-ip') || 'local'
 
