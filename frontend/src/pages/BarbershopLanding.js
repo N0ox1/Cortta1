@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Calendar, Clock, MapPin, Phone, Mail, Star, ArrowRight, Scissors, Users, Award } from 'lucide-react';

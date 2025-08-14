@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Calendar, Clock, MapPin, Phone, CheckCircle, ArrowLeft, Download, Share2 } from 'lucide-react';
