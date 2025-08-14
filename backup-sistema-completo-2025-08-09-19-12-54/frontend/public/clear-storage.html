@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Limpar Storage</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .info { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Limpar Storage</h1>
+    
+    <div class="info">
+        <h3>localStorage atual:</h3>
+        <pre id="localStorage-info"></pre>
+    </div>
+    
+    <div class="info">
+        <h3>sessionStorage atual:</h3>
+        <pre id="sessionStorage-info"></pre>
+    </div>
+    
+    <button onclick="clearAll()">🧹 Limpar TUDO</button>
+    <button onclick="clearLocalStorage()">🗂️ Limpar localStorage</button>
+    <button onclick="clearSessionStorage()">📋 Limpar sessionStorage</button>
+    <button onclick="forceClearAndReload()">💥 Forçar Limpeza e Recarregar</button>
+    <button onclick="goHome()">🏠 Ir para Home</button>
+    
+    <script>
+        function showStorageInfo() {
+            // Mostrar localStorage
+            const localItems = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                localItems[key] = localStorage.getItem(key);
+            }
+            document.getElementById('localStorage-info').textContent = JSON.stringify(localItems, null, 2);
+            
+            // Mostrar sessionStorage
+            const sessionItems = {};
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                sessionItems[key] = sessionStorage.getItem(key);
+            }
+            document.getElementById('sessionStorage-info').textContent = JSON.stringify(sessionItems, null, 2);
+        }
+        
+        function clearAll() {
+            localStorage.clear();
+            sessionStorage.clear();
+            alert('✅ Storage completamente limpo!');
+            showStorageInfo();
+        }
+        
+        function clearLocalStorage() {
+            localStorage.clear();
+            alert('✅ localStorage limpo!');
+            showStorageInfo();
+        }
+        
+        function clearSessionStorage() {
+            sessionStorage.clear();
+            alert('✅ sessionStorage limpo!');
+            showStorageInfo();
+        }
+        
+        function forceClearAndReload() {
+            localStorage.clear();
+            sessionStorage.clear();
+            // Forçar limpeza de cookies também
+            document.cookie.split(";").forEach(function(c) { 
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+            });
+            alert('💥 Storage completamente limpo! Recarregando...');
+            window.location.reload(true);
+        }
+        
+        function goHome() {
+            window.location.href = '/';
+        }
+        
+        // Mostrar informações ao carregar
+        showStorageInfo();
+    </script>
+</body>
+</html> 

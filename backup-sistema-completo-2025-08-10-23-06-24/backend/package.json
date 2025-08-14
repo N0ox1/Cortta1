@@ -1,0 +1,47 @@
+{
+  "name": "barbearia-saas-backend",
+  "version": "1.0.0",
+  "description": "Backend para sistema de barbearias SaaS",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "dev:robust": "node scripts/start.js",
+    "migrate": "node src/scripts/safe-migrate.js dev",
+    "migrate:deploy": "node src/scripts/safe-migrate.js deploy",
+    "migrate:reset": "node src/scripts/safe-migrate.js reset",
+    "backup": "node src/scripts/backup.js create",
+    "backup:auto": "node src/scripts/backup.js create",
+    "backup:restore": "node src/scripts/backup.js restore",
+    "backup:list": "node src/scripts/backup.js list",
+    "seed": "node src/scripts/seed.js",
+    "studio": "npx prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "prisma": "^5.22.0"
+  },
+  "keywords": [
+    "barbearia",
+    "saas",
+    "nodejs",
+    "express",
+    "prisma"
+  ],
+  "author": "Cortta Team",
+  "license": "MIT"
+}

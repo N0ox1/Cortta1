@@ -1,0 +1,36 @@
+[35mREADME.md[m[36m:[m[1;31mDATABASE_URL[m="postgresql://postgres:password@localhost:5432/barbearia_saas"
+[35mREADME.md[m[36m:[m[1;31mDATABASE_URL[m=...
+[35mbackend/env.example[m[36m:[m[1;31mDATABASE_URL[m="postgresql://postgres:password@localhost:5432/barbearia_saas"
+[35mbackend/prisma/schema.prisma[m[36m:[m  url      = env("[1;31mDATABASE_URL[m")
+[35mbackend/scripts/start.js[m[36m:[mif (!process.env.[1;31mDATABASE_URL[m) {
+[35mbackend/scripts/start.js[m[36m:[m  process.env.[1;31mDATABASE_URL[m = "postgresql://postgres:Vitor160201!@localhost:5432/barbearia_saas";
+[35mbackend/scripts/start.js[m[36m:[mconsole.log(`🗄️  Banco: ${process.env.[1;31mDATABASE_URL[m ? 'Configurado' : 'NÃO CONFIGURADO'}`);
+[35mbackend/src/config/database.js[m[36m:[m  url: process.env.[1;31mDATABASE_URL[m || "postgresql://postgres:Vitor160201!@localhost:5432/barbearia_saas",
+[35mbackup-sistema-completo-2025-08-09-19-12-54/README.md[m[36m:[m[1;31mDATABASE_URL[m="postgresql://postgres:password@localhost:5432/barbearia_saas"
+[35mbackup-sistema-completo-2025-08-09-19-12-54/README.md[m[36m:[m[1;31mDATABASE_URL[m=...
+[35mbackup-sistema-completo-2025-08-09-19-12-54/backend/env.example[m[36m:[m[1;31mDATABASE_URL[m="postgresql://postgres:password@localhost:5432/barbearia_saas"
+[35mbackup-sistema-completo-2025-08-09-19-12-54/backend/prisma/schema.prisma[m[36m:[m  url      = env("[1;31mDATABASE_URL[m")
+[35mbackup-sistema-completo-2025-08-09-19-12-54/backend/scripts/start.js[m[36m:[mif (!process.env.[1;31mDATABASE_URL[m) {
+[35mbackup-sistema-completo-2025-08-09-19-12-54/backend/scripts/start.js[m[36m:[m  process.env.[1;31mDATABASE_URL[m = "postgresql://postgres:Vitor160201!@localhost:5432/barbearia_saas";
+[35mbackup-sistema-completo-2025-08-09-19-12-54/backend/scripts/start.js[m[36m:[mconsole.log(`🗄️  Banco: ${process.env.[1;31mDATABASE_URL[m ? 'Configurado' : 'NÃO CONFIGURADO'}`);
+[35mbackup-sistema-completo-2025-08-09-19-12-54/backend/src/config/database.js[m[36m:[m  url: process.env.[1;31mDATABASE_URL[m || "postgresql://postgres:Vitor160201!@localhost:5432/barbearia_saas",
+[35mbackup-sistema-completo-2025-08-09-19-12-54/iniciar-barbearia.bat[m[36m:[mset [1;31mDATABASE_URL[m=postgresql://postgres:Vitor160201!@localhost:5432/barbearia_saas
+[35mbackup-sistema-completo-2025-08-09-21-03-32/README.md[m[36m:[m[1;31mDATABASE_URL[m="postgresql://postgres:password@localhost:5432/barbearia_saas"
+[35mbackup-sistema-completo-2025-08-09-21-03-32/README.md[m[36m:[m[1;31mDATABASE_URL[m=...
+[35mbackup-sistema-completo-2025-08-09-21-03-32/backend/env.example[m[36m:[m[1;31mDATABASE_URL[m="postgresql://postgres:password@localhost:5432/barbearia_saas"
+[35mbackup-sistema-completo-2025-08-09-21-03-32/backend/prisma/schema.prisma[m[36m:[m  url      = env("[1;31mDATABASE_URL[m")
+[35mbackup-sistema-completo-2025-08-09-21-03-32/backend/scripts/start.js[m[36m:[mif (!process.env.[1;31mDATABASE_URL[m) {
+[35mbackup-sistema-completo-2025-08-09-21-03-32/backend/scripts/start.js[m[36m:[m  process.env.[1;31mDATABASE_URL[m = "postgresql://postgres:Vitor160201!@localhost:5432/barbearia_saas";
+[35mbackup-sistema-completo-2025-08-09-21-03-32/backend/scripts/start.js[m[36m:[mconsole.log(`🗄️  Banco: ${process.env.[1;31mDATABASE_URL[m ? 'Configurado' : 'NÃO CONFIGURADO'}`);
+[35mbackup-sistema-completo-2025-08-09-21-03-32/backend/src/config/database.js[m[36m:[m  url: process.env.[1;31mDATABASE_URL[m || "postgresql://postgres:Vitor160201!@localhost:5432/barbearia_saas",
+[35mbackup-sistema-completo-2025-08-09-21-03-32/iniciar-barbearia.bat[m[36m:[mset [1;31mDATABASE_URL[m=postgresql://postgres:Vitor160201!@localhost:5432/barbearia_saas
+[35mbackup-sistema-completo-2025-08-10-23-06-24/README.md[m[36m:[m[1;31mDATABASE_URL[m="postgresql://postgres:password@localhost:5432/barbearia_saas"
+[35mbackup-sistema-completo-2025-08-10-23-06-24/README.md[m[36m:[m[1;31mDATABASE_URL[m=...
+[35mbackup-sistema-completo-2025-08-10-23-06-24/backend/env.example[m[36m:[m[1;31mDATABASE_URL[m="postgresql://postgres:password@localhost:5432/barbearia_saas"
+[35mbackup-sistema-completo-2025-08-10-23-06-24/backend/prisma/schema.prisma[m[36m:[m  url      = env("[1;31mDATABASE_URL[m")
+[35mbackup-sistema-completo-2025-08-10-23-06-24/backend/scripts/start.js[m[36m:[mif (!process.env.[1;31mDATABASE_URL[m) {
+[35mbackup-sistema-completo-2025-08-10-23-06-24/backend/scripts/start.js[m[36m:[m  process.env.[1;31mDATABASE_URL[m = "postgresql://postgres:Vitor160201!@localhost:5432/barbearia_saas";
+[35mbackup-sistema-completo-2025-08-10-23-06-24/backend/scripts/start.js[m[36m:[mconsole.log(`🗄️  Banco: ${process.env.[1;31mDATABASE_URL[m ? 'Configurado' : 'NÃO CONFIGURADO'}`);
+[35mbackup-sistema-completo-2025-08-10-23-06-24/backend/src/config/database.js[m[36m:[m  url: process.env.[1;31mDATABASE_URL[m || "postgresql://postgres:Vitor160201!@localhost:5432/barbearia_saas",
+[35mfrontend/prisma/schema.prisma[m[36m:[m  url      = env("[1;31mDATABASE_URL[m")
+[35miniciar-barbearia.bat[m[36m:[mset [1;31mDATABASE_URL[m=postgresql://postgres:Vitor160201!@localhost:5432/barbearia_saas

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Forçar Limpeza</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        button { 
+            padding: 15px 30px; 
+            margin: 10px; 
+            background: #ff4757; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        button:hover { 
+            background: #ff3742; 
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .info { 
+            background: rgba(255,255,255,0.1); 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin: 20px 0; 
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        h1 { text-align: center; margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💥 Forçar Limpeza Completa</h1>
+        
+        <div class="info">
+            <h3>🔍 Status atual:</h3>
+            <p>Token no localStorage: <span id="token-status">Verificando...</span></p>
+            <p>Cookies: <span id="cookie-status">Verificando...</span></p>
+        </div>
+        
+        <div style="text-align: center;">
+            <button onclick="nuclearClear()">💣 LIMPEZA NUCLEAR</button>
+            <br>
+            <button onclick="goHome()">🏠 Ir para Home</button>
+        </div>
+    </div>
+    
+    <script>
+        function checkStatus() {
+            const token = localStorage.getItem('token');
+            const cookies = document.cookie;
+            
+            document.getElementById('token-status').textContent = 
+                token ? `EXISTE (${token.length} chars)` : 'NÃO EXISTE';
+            document.getElementById('cookie-status').textContent = 
+                cookies ? `EXISTEM (${cookies.length} chars)` : 'NÃO EXISTEM';
+        }
+        
+        function nuclearClear() {
+            // Limpar localStorage
+            localStorage.clear();
+            
+            // Limpar sessionStorage
+            sessionStorage.clear();
+            
+            // Limpar todos os cookies
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i];
+                const eqPos = cookie.indexOf("=");
+                const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+            }
+            
+            // Limpar cache do navegador (força recarregamento)
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    for (let name of names) caches.delete(name);
+                });
+            }
+            
+            alert('💣 LIMPEZA NUCLEAR COMPLETA!\n\nTodos os dados foram removidos.\nRecarregando a página...');
+            
+            // Forçar recarregamento sem cache
+            window.location.reload(true);
+        }
+        
+        function goHome() {
+            window.location.href = '/';
+        }
+        
+        // Verificar status ao carregar
+        checkStatus();
+        
+        // Verificar a cada 2 segundos
+        setInterval(checkStatus, 2000);
+    </script>
+</body>
+</html> 
