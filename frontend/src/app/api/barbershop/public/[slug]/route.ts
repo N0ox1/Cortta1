@@ -13,9 +13,8 @@ export async function GET(req: Request, { params }: { params: { slug: string } }
            || req.headers.get('x-real-ip') || 'local'
 
   const rl = await allow(`${ip}:${slug}`, 60, 60)
-  if (!rl.ok)
-    return NextResponse.json({ error: 'Too Many Requests' },
-      { status: 429, headers: { 'Retry-After': String(rl.retry) } })
+  if (!rl.ok) return NextResponse.json({ error: 'Too Many Requests' },
+    { status: 429, headers: { 'Retry-After': String(rl.retry) } })
 
   const cacheKey = `shop:${slug}`
   const cached = await redis.get<string>(cacheKey)

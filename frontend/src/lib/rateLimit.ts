@@ -1,6 +1,6 @@
 import { redis } from '@/lib/redis'
 
-export async function allow(key: string, limit = 60, windowSec = 60) {
+export async function allow(key: string, limit=60, windowSec=60) {
   const bucket = Math.floor(Date.now()/1000/windowSec)
   const k = `rl:${key}:${bucket}`
   const c = await redis.incr(k)
