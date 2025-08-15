@@ -20,13 +20,18 @@ export async function POST(req: Request) {
   const tenantId = newTenantId();
 
   try {
+    const now = new Date();
+
     const shop = await prisma.barbershop.create({
       data: {
-        id: crypto.randomUUID(),          // <- garante id
+        id: crypto.randomUUID(),    // UUID exigido pelo schema atual
         tenantId,
         slug,
         name,
+        email,                      // ← requerido pelo seu schema
         isActive: true,
+        createdAt: now,             // ← caso seja NOT NULL
+        updatedAt: now,             // ← requerido pelo seu schema
       },
       select: { id: true, tenantId: true, slug: true, name: true },
     });
