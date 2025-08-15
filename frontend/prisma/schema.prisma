@@ -18,14 +18,11 @@ model User {
   isActive            Boolean       @default(true)
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
-  tenantId            String?
+  barbershopId        String?
   appointments        Appointment[] @relation("BarberAppointments")
   createdAppointments Appointment[] @relation("CreatedAppointments")
-  barbershop          Barbershop?   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  barbershops         Barbershop?   @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
 
-  @@index([email])
-  @@index([tenantId])
-  @@index([tenantId, role])
   @@map("users")
 }
 
@@ -37,15 +34,13 @@ model Service {
   duration            Int
   category            ServiceCategory
   isActive            Boolean              @default(true)
+  barbershopId        String
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
-  tenantId            String
   appointmentServices AppointmentService[]
-  barbershop          Barbershop              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  barbershops         Barbershop           @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
 
-  @@unique([tenantId, name])
-  @@index([tenantId])
-  @@index([tenantId, isActive])
+  @@unique([barbershopId, name])
   @@map("services")
 }
 
@@ -56,40 +51,33 @@ model Client {
   phone        String?
   birthDate    DateTime?
   address      String?
+  barbershopId String
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-  tenantId     String
   appointments Appointment[]
-  barbershop   Barbershop    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  barbershops  Barbershop    @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
 
-  @@unique([tenantId, email])
-  @@index([tenantId])
+  @@unique([barbershopId, email])
   @@map("clients")
 }
 
 model Appointment {
-  id          String               @id @default(cuid())
-  date        DateTime
-  status      AppointmentStatus    @default(SCHEDULED)
-  notes       String?
-  clientId    String
-  barberId    String?
-  createdById String
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
-  tenantId    String
-  services    AppointmentService[]
-  barber      User?                @relation("BarberAppointments", fields: [barberId], references: [id])
-  client      Client               @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  createdBy   User                 @relation("CreatedAppointments", fields: [createdById], references: [id])
-  barbershop  Barbershop          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  id           String               @id @default(cuid())
+  date         DateTime
+  status       AppointmentStatus    @default(SCHEDULED)
+  notes        String?
+  barbershopId String
+  clientId     String
+  barberId     String?
+  createdById  String
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  services     AppointmentService[]
+  barber       User?                @relation("BarberAppointments", fields: [barberId], references: [id])
+  barbershops  Barbershop           @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  client       Client               @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  createdBy    User                 @relation("CreatedAppointments", fields: [createdById], references: [id])
 
-  @@index([barberId])
-  @@index([clientId])
-  @@index([tenantId, date])
-  @@index([tenantId, date, status])
-  @@index([tenantId])
-  @@index([tenantId, status])
   @@map("appointments")
 }
 
@@ -103,26 +91,22 @@ model AppointmentService {
   service       Service     @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
   @@unique([appointmentId, serviceId])
-  @@index([appointmentId])
-  @@index([serviceId])
   @@map("appointment_services")
 }
 
 model Payment {
-  id          String        @id @default(cuid())
-  amount      Decimal       @db.Decimal(10, 2)
-  status      PaymentStatus @default(PENDING)
-  method      PaymentMethod
-  dueDate     DateTime
-  paidAt      DateTime?
-  description String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  tenantId    String
-  barbershop  Barbershop   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  id           String        @id @default(cuid())
+  amount       Decimal       @db.Decimal(10, 2)
+  status       PaymentStatus @default(PENDING)
+  method       PaymentMethod
+  dueDate      DateTime
+  paidAt       DateTime?
+  description  String?
+  barbershopId String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  barbershops  Barbershop    @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
 
-  @@index([status])
-  @@index([tenantId])
   @@map("payments")
 }
 
@@ -146,55 +130,23 @@ model JoinRequest {
   userLastName  String
   userPhone     String?
   userCountry   String?
+  barbershopId  String
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
   userPassword  String?
-  tenantId      String
-  barbershop    Barbershop       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  barbershops   Barbershop        @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
 
-  @@index([status])
-  @@index([tenantId])
-  @@index([tenantId, status])
   @@map("join_requests")
-}
-
-model audit_logs {
-  id        String   @id
-  action    String
-  entity    String
-  entityId  String?
-  userId    String?
-  tenantId  String?
-  oldValues Json?
-  newValues Json?
-  ipAddress String?
-  userAgent String?
-  createdAt DateTime @default(now())
-
-  @@index([action])
-  @@index([createdAt])
-  @@index([tenantId])
-  @@index([userId])
-}
-
-model cache_entries {
-  id        String   @id
-  key       String   @unique
-  value     String
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-
-  @@index([expiresAt])
 }
 
 model Barbershop {
   id        String  @id @default(cuid())
   tenantId  String
   slug      String
-  name      String?          // <- adiciona opcional AGORA
+  name      String
   isActive  Boolean @default(true)
 
-  // Relações inversas
+  // Relações inversas (necessárias para outros models)
   users                 User[]
   services              Service[]
   clients               Client[]
@@ -204,7 +156,13 @@ model Barbershop {
 
   @@unique([tenantId, slug])
   @@index([tenantId])
-  @@map("barbershops")   // <- mapeia para a tabela real
+  @@map("barbershops")
+}
+
+model rate_limits {
+  key      String   @id
+  tokens   Int
+  reset_at DateTime @db.Timestamptz(6)
 }
 
 enum UserRole {
