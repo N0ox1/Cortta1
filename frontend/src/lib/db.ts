@@ -12,3 +12,6 @@ export const db =
   });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+
+// ✅ compat: módulos que importam { prisma } continuam funcionando
+export { db as prisma };
