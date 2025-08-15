@@ -9,13 +9,12 @@ const redis = Redis.fromEnv();
 
 export async function GET(
   req: NextRequest,
-  ctx: { params: { slug: string } }
+  { params }: { params: { slug: string } }
 ) {
-  const tenantId = resolveTenant(req); // hoje cai no header, depois suportará subdomínio
-  const slug = ctx.params.slug;
+  const tenantId = resolveTenant(req);
+  const slug = params.slug;
   const key = `bs:${tenantId}:${slug}`;
 
-  // Cache primeiro
   const cached = await redis.get(key);
   if (cached) {
     return NextResponse.json(cached, {
@@ -27,7 +26,6 @@ export async function GET(
     });
   }
 
-  // DB
   const shop = await prisma.barbershop.findFirst({
     where: { tenantId, slug, isActive: true },
   });
@@ -37,15 +35,11 @@ export async function GET(
       { error: "not_found" },
       {
         status: 404,
-        headers: {
-          "X-Tenant-Id": tenantId,
-          "Cache-Control": "no-store",
-        },
+        headers: { "X-Tenant-Id": tenantId, "Cache-Control": "no-store" },
       }
     );
   }
 
-  // Seta cache
   await redis.set(key, shop, { ex: 60 });
 
   return NextResponse.json(shop, {
