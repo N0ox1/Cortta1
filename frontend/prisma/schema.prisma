@@ -188,55 +188,22 @@ model cache_entries {
 }
 
 model Barbershop {
-  id                    String             @id @default(cuid())
-  tenantId              String
-  name                  String
-  slug                  String
-  email                 String             @unique
-  phone                 String?
-  address               String?
-  city                  String?
-  state                 String?
-  zipCode               String?
-  number                String?
-  complement            String?
-  onlineOnly            Boolean            @default(false)
-  description           String?
-  website               String?
-  logo                  String?
-  logoImage             String?
-  bannerImage           String?
-  instagram             String?
-  whatsapp              String?
-  categories            Json?
-  teamSize              String?
-  primaryColor          String?            @default("#2563eb")
-  secondaryColor        String?            @default("#1e40af")
-  accentColor           String?            @default("#fbbf24")
-  workingHours          Json?
-  isActive              Boolean            @default(true)
-  isBlocked             Boolean            @default(false)
-  subscriptionPlan      SubscriptionPlan   @default(BASIC)
-  subscriptionStatus    SubscriptionStatus @default(ACTIVE)
-  subscriptionStartDate DateTime?
-  subscriptionEndDate   DateTime?
-  monthlyFee            Decimal            @default(29.90) @db.Decimal(10, 2)
-  totalRevenue          Decimal            @default(0) @db.Decimal(10, 2)
-  monthlyRevenue        Decimal            @default(0) @db.Decimal(10, 2)
-  databaseSchema        String?
-  isIsolated            Boolean            @default(false)
-  createdAt             DateTime           @default(now())
-  updatedAt             DateTime
-  appointments          Appointment[]
-  clients               Client[]
-  join_requests         JoinRequest[]
-  payments              Payment[]
-  services              Service[]
+  id        String  @id @default(cuid())
+  tenantId  String
+  slug      String
+  name      String?          // <- adiciona opcional AGORA
+  isActive  Boolean @default(true)
+
+  // Relações inversas
   users                 User[]
-  
+  services              Service[]
+  clients               Client[]
+  appointments          Appointment[]
+  payments              Payment[]
+  join_requests         JoinRequest[]
+
   @@unique([tenantId, slug])
   @@index([tenantId])
-  @@map("barbershops")
 }
 
 enum UserRole {
