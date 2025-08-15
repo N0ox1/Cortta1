@@ -1,10 +1,10 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { redis } from "@/lib/redis";
 
-// 20 req / 10s, com burst 10
+// 20 req / 10s (janela deslizante)
 export const rlPub = new Ratelimit({
   redis,
-  limiter: Ratelimit.tokenBucket(20, "10 s", { burst: 10 }),
+  limiter: Ratelimit.slidingWindow(20, "10 s"),
   prefix: "rl:v1:pub"
 });
 
