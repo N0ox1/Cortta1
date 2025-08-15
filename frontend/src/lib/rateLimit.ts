@@ -1,9 +1,10 @@
-import { redis } from '@/lib/redis'
+import { incrWithExpire } from "./redis";
 
-export async function allow(key: string, limit=60, windowSec=60) {
-  const bucket = Math.floor(Date.now()/1000/windowSec)
-  const k = `rl:${key}:${bucket}`
-  const c = await redis.incr(k)
-  if (c === 1) await redis.expire(k, windowSec)
-  return { ok: c <= limit, retry: c <= limit ? 0 : windowSec }
+export async function allow(id: string, max: number, windowSeconds: number) {
+  const key = `rl:${id}`;
+  const count = await incrWithExpire(key, windowSeconds);
+  const allowed = count <= max;
+  const remaining = Math.max(0, max - count);
+  const reset = windowSeconds; // janela fixa
+  return { allowed, remaining, reset, count };
 }

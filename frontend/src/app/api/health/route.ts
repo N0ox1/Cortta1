@@ -1,9 +1,7 @@
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+import { NextResponse } from "next/server";
 
-import { prisma } from "@/lib/db";
+export const runtime = "nodejs";
 
 export async function GET() {
-  await prisma.$queryRaw`SELECT 1`;
-  return Response.json({ ok: true });
+  return NextResponse.json({ ok: true });
 }
