@@ -141,10 +141,10 @@ model JoinRequest {
 
 model Barbershop {
   id        String  @id @default(cuid())
-  tenantId  String
+  tenantId  String  @map("tenant_id")
   slug      String
   name      String
-  isActive  Boolean @default(true)
+  isActive  Boolean @default(true) @map("is_active")
 
   // Relações inversas (necessárias para outros models)
   users                 User[]
@@ -154,8 +154,8 @@ model Barbershop {
   payments              Payment[]
   join_requests         JoinRequest[]
 
-  @@unique([tenantId, slug])
-  @@index([tenantId])
+  @@unique([tenantId, slug], map: "barbershops_tenant_slug_key")
+  @@index([tenantId], map: "barbershops_tenant_idx")
   @@map("barbershops")
 }
 
