@@ -188,9 +188,10 @@ model cache_entries {
 }
 
 model Barbershop {
-  id                    String             @id
+  id                    String             @id @default(cuid())
+  tenantId              String
   name                  String
-  slug                  String             @unique
+  slug                  String
   email                 String             @unique
   phone                 String?
   address               String?
@@ -233,6 +234,8 @@ model Barbershop {
   services              Service[]
   users                 User[]
   
+  @@unique([tenantId, slug])
+  @@index([tenantId])
   @@map("barbershops")
 }
 
