@@ -140,7 +140,7 @@ model JoinRequest {
 }
 
 model Barbershop {
-  id        String  @id @default(cuid())
+  id        String  @id
   tenantId  String  @map("tenant_id")
   slug      String
   name      String
