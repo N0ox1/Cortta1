@@ -34,9 +34,9 @@ export async function GET(req: Request) {
     });
   }
 
-  // ✅ busca por slug (tenantId é opcional no schema atual)
+  // ✅ busca por tenantId + slug (funciona com ou sem constraint única)
   const shop = await db.barbershop.findFirst({
-    where: { slug },
+    where: { tenantId, slug },
     select: { id: true, name: true, slug: true, isActive: true },
   });
 
