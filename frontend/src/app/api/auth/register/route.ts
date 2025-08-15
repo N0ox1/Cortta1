@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { Redis } from "@upstash/redis";
 import crypto from "node:crypto";
-import { prisma } from "../../../lib/prisma"; // <- mudou
+import { prisma } from "../../../../lib/prisma"; // ← corrigido
 
 export const runtime = "nodejs";
 const redis = Redis.fromEnv();
