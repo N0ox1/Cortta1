@@ -204,6 +204,7 @@ model Barbershop {
 
   @@unique([tenantId, slug])
   @@index([tenantId])
+  @@map("barbershops")   // <- mapeia para a tabela real
 }
 
 enum UserRole {
