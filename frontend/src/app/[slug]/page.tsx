@@ -6,9 +6,17 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   return { title: `${params?.slug ?? "Barbearia"} | Cortta1` };
 }
 
-async function fetchBarbershop(tenantId: string, slug: string) {
-  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "";
+async function fetchBarbershop(slug: string) {
+  const h = await headers();
+  const tenantId = h.get("x-tenant-id") ?? "tenant-default";
+
+  // Base absoluta: env ou cabeçalhos do request
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const base = process.env.NEXT_PUBLIC_BASE_URL || `${proto}://${host}`;
+
   const url = `${base}/api/barbershop/public/${slug}`;
+
   const r = await fetch(url, {
     headers: { "X-Tenant-Id": tenantId },
     next: { revalidate: 60 },
@@ -18,11 +26,8 @@ async function fetchBarbershop(tenantId: string, slug: string) {
 }
 
 export default async function Page({ params }: any) {
-  const h = await headers(); // <-- await aqui
-  const tenantId = h.get("x-tenant-id") ?? "tenant-default";
   const slug = params?.slug as string;
-
-  const shop = await fetchBarbershop(tenantId, slug);
+  const shop = await fetchBarbershop(slug);
   if (!shop) return <div className="p-6">Barbearia não encontrada.</div>;
 
   return (
