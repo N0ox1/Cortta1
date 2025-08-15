@@ -7,17 +7,13 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
 }
 
 async function fetchBarbershop(slug: string) {
+  // Base obrigatória vinda da Vercel
+  const base = process.env.NEXT_PUBLIC_BASE_URL!;
+  // Tenant via header (header continua como fallback até ter subdomínio)
   const h = await headers();
   const tenantId = h.get("x-tenant-id") ?? "tenant-default";
 
-  // Base absoluta: env ou cabeçalhos do request
-  const proto = h.get("x-forwarded-proto") ?? "https";
-  const host = h.get("x-forwarded-host") ?? h.get("host");
-  const base = process.env.NEXT_PUBLIC_BASE_URL || `${proto}://${host}`;
-
-  const url = `${base}/api/barbershop/public/${slug}`;
-
-  const r = await fetch(url, {
+  const r = await fetch(`${base}/api/barbershop/public/${slug}`, {
     headers: { "X-Tenant-Id": tenantId },
     next: { revalidate: 60 },
   });
