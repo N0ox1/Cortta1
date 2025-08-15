@@ -1,18 +1,16 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { redis } from "@/lib/redis";
 import { db } from "@/lib/db";
 import { allow } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 
-export async function GET(
-  req: Request,
-  { params }: { params: { slug: string } }
-) {
-  const slug = params.slug;
+export async function GET(_req: NextRequest, context: { params: { slug: string } }) {
+  const { slug } = context.params;
 
   // ----- RATE LIMIT -----
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? "0";
+  const ip = _req.headers.get("x-forwarded-for")?.split(",")[0] ?? "0";
   const { allowed } = await allow(`${ip}:${slug}`, 60, 60);
   if (!allowed) {
     return NextResponse.json(
