@@ -1,60 +1,57 @@
-import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { redis } from "@/lib/redis";
+// src/app/api/barbershop/public/[slug]/route.ts
+import { NextResponse, type NextRequest } from "next/server";
+import { resolveTenant } from "@/lib/tenant";
+import { Redis } from "@upstash/redis";
+import { prisma } from "@/lib/db";
 
 export const runtime = "nodejs";
+const redis = Redis.fromEnv();
 
-// util simples p/ obter tenant; ajuste depois para subdomínio
-function getTenantId(req: Request) {
-  // temporário: leia de header (ou defina default)
-  const h = req.headers.get("x-tenant-id");
-  if (h && /^[a-z0-9-]{3,64}$/i.test(h)) return h;
-  // se já usa subdomínio: descomente abaixo
-  // const host = new URL(req.url).host; const p = host.split("."); if (p.length>=3) return p[0];
-  return "tenant-default";
-}
-
-export async function GET(req: Request) {
-  const url = new URL(req.url);
-  const slug = url.pathname.split("/").pop() ?? "";
-  const tenantId = getTenantId(req);
-
-  if (!slug) return NextResponse.json({ error: "invalid_slug" }, { status: 400 });
-
-  // chave de cache por tenant+slug
+export async function GET(
+  req: NextRequest,
+  ctx: { params: { slug: string } }
+) {
+  const tenantId = resolveTenant(req); // hoje cai no header, depois suportará subdomínio
+  const slug = ctx.params.slug;
   const key = `bs:${tenantId}:${slug}`;
-  const cached = await redis.get<string>(key);
+
+  // Cache primeiro
+  const cached = await redis.get(key);
   if (cached) {
-    return new NextResponse(cached, {
+    return NextResponse.json(cached, {
       headers: {
-        "Content-Type": "application/json",
         "X-Cache-Source": "redis",
+        "X-Tenant-Id": tenantId,
         "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
       },
     });
   }
 
-  // ✅ busca por tenantId + slug (funciona com ou sem constraint única)
-  const shop = await db.barbershop.findFirst({
-    where: { tenantId, slug },
-    select: { id: true, name: true, slug: true, isActive: true },
+  // DB
+  const shop = await prisma.barbershop.findFirst({
+    where: { tenantId, slug, isActive: true },
   });
 
-  if (!shop) return NextResponse.json({ error: "not_found" }, { status: 404 });
+  if (!shop) {
+    return NextResponse.json(
+      { error: "not_found" },
+      {
+        status: 404,
+        headers: {
+          "X-Tenant-Id": tenantId,
+          "Cache-Control": "no-store",
+        },
+      }
+    );
+  }
 
-  const body = JSON.stringify({
-    id: shop.id,
-    name: shop.name,
-    slug: shop.slug,
-    status: shop.isActive ? "active" : "inactive",
-  });
+  // Seta cache
+  await redis.set(key, shop, { ex: 60 });
 
-  await redis.set(key, body, { ex: 60 });
-
-  return new NextResponse(body, {
+  return NextResponse.json(shop, {
     headers: {
-      "Content-Type": "application/json",
       "X-Cache-Source": "db",
+      "X-Tenant-Id": tenantId,
       "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
     },
   });

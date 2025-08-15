@@ -1,62 +1,81 @@
 // src/middleware.ts
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { Ratelimit } from "@upstash/ratelimit";
-import { redis } from "@/lib/redis";
+import { Redis } from "@upstash/redis";
+import { resolveTenant } from "@/lib/tenant";
 
 export const config = {
   matcher: ["/api/:path*"],
 };
 
-// Limite global: 600 req/min por IP
+const redis = Redis.fromEnv();
+
 const rlGlobal = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(600, "60 s"),
+  limiter: Ratelimit.slidingWindow(600, "1 m"),
   analytics: true,
-  prefix: "rl:v1:global",
+  prefix: "rl:global",
 });
 
-// Limite público: 60 req/min por IP + slug
-const rlPub = new Ratelimit({
+const rlPublic = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(60, "60 s"),
+  limiter: Ratelimit.slidingWindow(60, "1 m"),
   analytics: true,
-  prefix: "rl:v1:pub",
+  prefix: "rl:public",
 });
 
-export default async function middleware(req: Request) {
-  const ip =
-    req.headers.get("x-real-ip") ??
-    req.headers.get("x-forwarded-for")?.split(",")[0] ??
-    "unknown";
+function ipFrom(req: NextRequest): string {
+  const xf = req.headers.get("x-forwarded-for");
+  if (xf) return xf.split(",")[0].trim();
+  return req.ip ?? "0.0.0.0";
+}
 
-  const url = new URL(req.url);
-  const slug = url.pathname.replace("/api/barbershop/public/", "");
+function slugFromPath(pathname: string): string | null {
+  const m = pathname.match(/^\/api\/barbershop\/public\/([^\/?#]+)/);
+  return m?.[1] ?? null;
+}
 
-  // Global
-  const rGlobal = await rlGlobal.limit(ip);
-  if (!rGlobal.success) {
-    return new NextResponse("Too Many Requests (global)", {
-      status: 429,
-      headers: {
-        "X-RateLimit-Limit": "600/60s",
-        "X-RateLimit-Remaining": rGlobal.remaining.toString(),
-        "Retry-After": "60",
-      },
-    });
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // Global 600/min por IP para toda API
+  if (pathname.startsWith("/api/")) {
+    const ip = ipFrom(req);
+    const g = await rlGlobal.limit(`g:${ip}`);
+    if (!g.success) {
+      return NextResponse.json(
+        { error: "rate_limited_global" },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": "60",
+            "Cache-Control": "no-store",
+          },
+        }
+      );
+    }
   }
 
-  // Público
-  if (url.pathname.startsWith("/api/barbershop/public/")) {
-    const rPub = await rlPub.limit(`${ip}:${slug}`);
-    if (!rPub.success) {
-      return new NextResponse("Too Many Requests (public)", {
-        status: 429,
-        headers: {
-          "X-RateLimit-Limit": "60/60s",
-          "X-RateLimit-Remaining": rPub.remaining.toString(),
-          "Retry-After": "60",
-        },
-      });
+  // Público 60/min por IP+tenant+slug
+  if (pathname.startsWith("/api/barbershop/public/")) {
+    const ip = ipFrom(req);
+    const tenantId = resolveTenant(req);
+    const slug = slugFromPath(pathname) ?? "unknown";
+    const key = `${ip}:t:${tenantId}:s:${slug}`;
+
+    const r = await rlPublic.limit(key);
+    if (!r.success) {
+      return NextResponse.json(
+        { error: "rate_limited_public" },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": "60",
+            "Cache-Control": "no-store",
+            "X-Tenant-Id": tenantId,
+          },
+        }
+      );
     }
   }
 
