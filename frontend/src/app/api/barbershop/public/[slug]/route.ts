@@ -7,12 +7,9 @@ import { prisma } from "@/lib/db";
 export const runtime = "nodejs";
 const redis = Redis.fromEnv();
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { slug: string } }
-) {
+export async function GET(req: NextRequest, context: any) {
+  const { slug } = (context?.params ?? {}) as { slug: string };
   const tenantId = resolveTenant(req);
-  const slug = params.slug;
   const key = `bs:${tenantId}:${slug}`;
 
   const cached = await redis.get(key);
