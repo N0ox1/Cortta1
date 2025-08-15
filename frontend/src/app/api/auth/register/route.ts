@@ -22,12 +22,13 @@ export async function POST(req: Request) {
   try {
     const shop = await prisma.barbershop.create({
       data: { tenantId, slug, name, isActive: true },
+      select: { id: true, tenantId: true, slug: true, name: true },
     });
 
-    await (await Redis.fromEnv()).del(`bs:${tenantId}:${slug}`);
+    await redis.del(`bs:${tenantId}:${slug}`);
 
     return NextResponse.json(
-      { ok: true, tenantId: shop.tenantId, slug: shop.slug, id: shop.id },
+      { ok: true, id: shop.id, tenantId: shop.tenantId, slug: shop.slug, name: shop.name },
       { status: 200, headers: { "Cache-Control": "no-store", "X-Tenant-Id": tenantId } }
     );
   } catch (err: any) {
