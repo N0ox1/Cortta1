@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { redis } from "@/lib/redis";
 import { db } from "@/lib/db";
-import { allow } from "@/lib/rateLimit";
+import { rl } from "@/lib/ratelimiter";
 
 export const runtime = "nodejs";
 
@@ -16,8 +16,18 @@ export async function GET(req: Request) {
 
   // rate limit
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? "0";
-  const { allowed } = await allow(`${ip}:${slug}`, 60, 60);
-  if (!allowed) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  const { success, remaining, reset } = await rl.limit(`${ip}:${slug}`);
+  if (!success) {
+    return NextResponse.json(
+      { error: "rate_limited" },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(Math.max(0, Math.ceil((reset - Date.now()) / 1000)))
+        }
+      }
+    );
+  }
 
   // cache
   const key = `barbershop:${slug}`;
