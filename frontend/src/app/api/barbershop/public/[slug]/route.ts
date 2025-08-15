@@ -9,7 +9,9 @@ const redis = Redis.fromEnv();
 
 export async function GET(req: NextRequest, context: any) {
   const { slug } = (context?.params ?? {}) as { slug: string };
+
   const tenantId = resolveTenant(req);
+
   const key = `bs:${tenantId}:${slug}`;
 
   const cached = await redis.get(key);
@@ -32,7 +34,10 @@ export async function GET(req: NextRequest, context: any) {
       { error: "not_found" },
       {
         status: 404,
-        headers: { "X-Tenant-Id": tenantId, "Cache-Control": "no-store" },
+        headers: {
+          "X-Tenant-Id": tenantId,
+          "Cache-Control": "no-store",
+        },
       }
     );
   }

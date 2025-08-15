@@ -1,14 +1,12 @@
 // src/lib/tenant.ts
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 export function resolveTenant(req: NextRequest): string {
-  // Temporário: leia de header (depois suportará subdomínio)
-  const tenantId = req.headers.get("x-tenant-id");
-  
-  if (tenantId && /^[a-z0-9-]{3,64}$/i.test(tenantId)) {
-    return tenantId;
-  }
-  
-  // Se não houver header válido, retorna tenant padrão
-  return "tenant-default";
+  const h = req.headers;
+  const host = h.get("host") ?? "";
+  const sub = host.split(":")[0].split(".")[0]; // ignora porta
+  if (sub && sub !== "www" && !sub.endsWith("vercel")) return sub;
+
+  const header = h.get("x-tenant-id");
+  return header && header.trim() ? header.trim() : "tenant-default";
 }
