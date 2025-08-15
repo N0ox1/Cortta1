@@ -140,19 +140,49 @@ model JoinRequest {
 }
 
 model Barbershop {
-  id        String  @id @default(cuid())      // simples, sem extensão no PG
-  tenantId  String  @map("tenant_id")
-  slug      String
-  name      String
-  isActive  Boolean @default(true) @map("is_active")
-
-  // Relações inversas (necessárias para outros models)
-  users                 User[]
-  services              Service[]
-  clients               Client[]
+  id                    String             @id @default(cuid())
+  name                  String
+  slug                  String             @unique
+  email                 String             @unique
+  phone                 String?
+  address               String?
+  city                  String?
+  state                 String?
+  zipCode               String?
+  description           String?
+  logo                  String?
+  logoImage             String?
+  bannerImage           String?
+  instagram             String?
+  whatsapp              String?
+  primaryColor          String?            @default("#2563eb")
+  secondaryColor        String?            @default("#1e40af")
+  accentColor           String?            @default("#fbbf24")
+  workingHours          Json?
+  isBlocked             Boolean            @default(false)
+  subscriptionPlan      SubscriptionPlan   @default(BASIC)
+  subscriptionStatus    SubscriptionStatus @default(ACTIVE)
+  subscriptionStartDate DateTime?
+  subscriptionEndDate   DateTime?
+  monthlyFee            Decimal            @default(29.90) @db.Decimal(10, 2)
+  totalRevenue          Decimal            @default(0) @db.Decimal(10, 2)
+  monthlyRevenue        Decimal            @default(0) @db.Decimal(10, 2)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime
+  website               String?
+  categories            Json?
+  teamSize              String?
+  complement            String?
+  number                String?
+  onlineOnly            Boolean            @default(false)
+  tenantId              String             @map("tenant_id")
+  isActive              Boolean            @map("is_active")
   appointments          Appointment[]
-  payments              Payment[]
+  clients               Client[]
   join_requests         JoinRequest[]
+  payments              Payment[]
+  services              Service[]
+  users                 User[]
 
   @@unique([tenantId, slug], map: "barbershops_tenant_slug_key")
   @@index([tenantId], map: "barbershops_tenant_idx")
