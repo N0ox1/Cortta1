@@ -21,7 +21,13 @@ export async function POST(req: Request) {
 
   try {
     const shop = await prisma.barbershop.create({
-      data: { tenantId, slug, name, isActive: true },
+      data: {
+        id: crypto.randomUUID(),          // <- garante id
+        tenantId,
+        slug,
+        name,
+        isActive: true,
+      },
       select: { id: true, tenantId: true, slug: true, name: true },
     });
 
@@ -32,14 +38,7 @@ export async function POST(req: Request) {
       { status: 200, headers: { "Cache-Control": "no-store", "X-Tenant-Id": tenantId } }
     );
   } catch (err: any) {
-    console.error("register_error", {
-      code: err?.code,
-      message: err?.message,
-      meta: err?.meta,
-    });
-    if (err?.code === "P2002") {
-      return NextResponse.json({ error: "conflict" }, { status: 409 });
-    }
+    if (err?.code === "P2002") return NextResponse.json({ error: "conflict" }, { status: 409 });
     return NextResponse.json({ error: "server_error" }, { status: 500 });
   }
 }
