@@ -34,9 +34,9 @@ export async function GET(req: Request) {
     });
   }
 
-  // ✅ agora usa a UNIQUE composta tenantId+slug
-  const shop = await db.barbershop.findUnique({
-    where: { tenantId_slug: { tenantId, slug } },
+  // ✅ busca por slug (tenantId é opcional no schema atual)
+  const shop = await db.barbershop.findFirst({
+    where: { slug },
     select: { id: true, name: true, slug: true, isActive: true },
   });
 
