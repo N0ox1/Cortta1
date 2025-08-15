@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { redis } from "@/lib/redis";
 import { db } from "@/lib/db";
-import { rl } from "@/lib/ratelimiter";
+import { rlPub, rlGlobal } from "@/lib/ratelimiter";
 
 export const runtime = "nodejs";
 
@@ -16,21 +16,24 @@ export async function GET(req: Request) {
 
   // IP (Vercel envia X-Forwarded-For)
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "0";
+  const rateKey = `${ip}:slug:${slug}`;
 
-  // RATE LIMIT com Upstash
-  const { success, remaining, reset } = await rl.limit(`${ip}:${slug}`);
-  if (!success) {
-    return NextResponse.json(
-      { error: "rate_limited" },
-      {
-        status: 429,
-        headers: {
-          "Retry-After": String(Math.max(0, Math.ceil((reset - Date.now()) / 1000))),
-          "X-RateLimit-Limit": "60",
-          "X-RateLimit-Remaining": "0"
-        }
+  // primeiro global, depois específico
+  const g = await rlGlobal.limit(ip);
+  if (!g.success) {
+    return NextResponse.json({ error: "rate_limited_global" }, { status: 429, headers: { "Retry-After": String(Math.max(0, Math.ceil((g.reset - Date.now())/1000))) }});
+  }
+
+  const r = await rlPub.limit(rateKey);
+  if (!r.success) {
+    return NextResponse.json({ error: "rate_limited" }, {
+      status: 429,
+      headers: {
+        "Retry-After": String(Math.max(0, Math.ceil((r.reset - Date.now())/1000))),
+        "X-RateLimit-Limit": "20/10s",
+        "X-RateLimit-Remaining": "0"
       }
-    );
+    });
   }
 
   // CACHE
@@ -42,8 +45,8 @@ export async function GET(req: Request) {
         "Content-Type": "application/json",
         "X-Cache-Source": "redis",
         "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
-        "X-RateLimit-Limit": "60",
-        "X-RateLimit-Remaining": String(remaining)
+        "X-RateLimit-Limit": "20/10s",
+        "X-RateLimit-Remaining": String(r.remaining)
       }
     });
   }
@@ -69,8 +72,8 @@ export async function GET(req: Request) {
       "Content-Type": "application/json",
       "X-Cache-Source": "db",
       "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
-      "X-RateLimit-Limit": "60",
-      "X-RateLimit-Remaining": String(remaining)
+      "X-RateLimit-Limit": "20/10s",
+      "X-RateLimit-Remaining": String(r.remaining)
     }
   });
 }
