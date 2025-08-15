@@ -32,6 +32,11 @@ export async function POST(req: Request) {
       { status: 200, headers: { "Cache-Control": "no-store", "X-Tenant-Id": tenantId } }
     );
   } catch (err: any) {
+    console.error("register_error", {
+      code: err?.code,
+      message: err?.message,
+      meta: err?.meta,
+    });
     if (err?.code === "P2002") {
       return NextResponse.json({ error: "conflict" }, { status: 409 });
     }
