@@ -18,7 +18,7 @@ async function fetchBarbershop(tenantId: string, slug: string) {
 }
 
 export default async function Page({ params }: any) {
-  const h = headers();
+  const h = await headers(); // <-- await aqui
   const tenantId = h.get("x-tenant-id") ?? "tenant-default";
   const slug = params?.slug as string;
 
