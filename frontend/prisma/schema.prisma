@@ -140,7 +140,7 @@ model JoinRequest {
 }
 
 model Barbershop {
-  id        String  @id
+  id        String  @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
   tenantId  String  @map("tenant_id")
   slug      String
   name      String
