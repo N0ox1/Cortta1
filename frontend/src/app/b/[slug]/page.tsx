@@ -3,14 +3,16 @@ import { headers } from "next/headers";
 type Barbershop = { id: string; tenantId: string; slug: string; name: string };
 
 async function getBarbershop(slug: string): Promise<Barbershop> {
-  const h = await headers(); // <- await aqui
+  const h = await headers();
   const tenantId = h.get("x-tenant-id");
   if (!tenantId) throw new Error("Missing X-Tenant-Id");
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/barbershop/public/${slug}`,
-    { headers: { "X-Tenant-Id": tenantId }, next: { revalidate: 60 } }
-  );
+  // usar caminho relativo para este mesmo deploy
+  const res = await fetch(`/api/barbershop/public/${slug}`, {
+    headers: { "X-Tenant-Id": tenantId },
+    next: { revalidate: 60 },
+  });
+
   if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
   return res.json();
 }
@@ -20,7 +22,7 @@ export default async function Page({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params; // <- params é Promise no seu projeto
+  const { slug } = await params;
   const data = await getBarbershop(slug);
 
   return (
