@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   const services = await prisma.service.findMany({
     where: { barbershopId: shop.id, isActive: true },
     orderBy: { name: "asc" },
-    select: { id: true, name: true, duration: true, priceCents: true },
+    select: { id: true, name: true, duration: true, price: true },
     take: 100,
   });
 
@@ -27,15 +27,15 @@ export async function POST(req: NextRequest) {
   const tenantId = req.headers.get("x-tenant-id");
   if (!tenantId) return NextResponse.json({ error: "X-Tenant-Id requerido" }, { status: 400 });
   const body = await req.json();
-  const { slug, name, duration, priceCents, isActive = true } = body || {};
-  if (!slug || !name || !Number.isInteger(duration) || !Number.isInteger(priceCents))
+  const { slug, name, duration, price, isActive = true } = body || {};
+  if (!slug || !name || !Number.isInteger(duration) || !Number.isInteger(price))
     return NextResponse.json({ error: "payload inválido" }, { status: 400 });
 
   const shop = await prisma.barbershop.findFirst({ where: { tenantId, slug, isActive: true }, select: { id: true } });
   if (!shop) return NextResponse.json({ error: "barbearia não encontrada" }, { status: 404 });
 
   const svc = await prisma.service.create({
-    data: { barbershopId: shop.id, name, duration, priceCents, isActive },
+    data: { barbershopId: shop.id, name, duration, price, isActive },
     select: { id: true },
   });
 
