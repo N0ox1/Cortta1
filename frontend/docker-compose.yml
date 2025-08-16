@@ -21,14 +21,21 @@ services:
     environment:
       DATABASE_URL: "postgresql://postgres:ojimrXerXcCMknMrlfxgYLWvuehGVleX@maglev.proxy.rlwy.net:28542/railway?sslmode=require"
       SHADOW_DATABASE_URL: "postgresql://postgres:postgres@shadow:5432/shadow_prisma"
+      PRISMA_LOG_LEVEL: "debug"
     volumes:
       - ./:/app
     command: >
-      sh -c "
-        npx prisma validate &&
+      sh -ceu '
+        apt-get update >/dev/null &&
+        apt-get install -y postgresql-client >/dev/null ;
+        getent hosts shadow &&
+        pg_isready -h shadow -p 5432 -U postgres -d shadow_prisma &&
+        PGPASSWORD=postgres psql "postgresql://postgres:postgres@shadow:5432/shadow_prisma" -c "SELECT 1;" &&
+        node -e "console.log(process.env.DATABASE_URL, \"\\n\", process.env.SHADOW_DATABASE_URL)" &&
+        printf "SELECT 1;" | npx prisma db execute --url "$SHADOW_DATABASE_URL" --stdin &&
         npx prisma migrate dev -n service_adjustments --schema prisma/schema.prisma &&
         npx prisma generate
-      "
+      '
 
 volumes:
   pgshadow:
