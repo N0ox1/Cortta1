@@ -11,13 +11,18 @@ async function getBarbershop(slug: string): Promise<Barbershop> {
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/barbershop/public/${slug}`,
     { headers: { "X-Tenant-Id": tenantId }, next: { revalidate: 60 } }
   );
-
   if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
   return res.json();
 }
 
-export default async function Page({ params }: { params: { slug: string } }) {
-  const data = await getBarbershop(params.slug);
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params; // <- aguarda o Promise
+  const data = await getBarbershop(slug);
+
   return (
     <main className="mx-auto max-w-2xl p-6">
       <h1 className="text-3xl font-semibold">{data.name}</h1>
