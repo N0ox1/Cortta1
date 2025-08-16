@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 type Barbershop = { id: string; tenantId: string; slug: string; name: string };
 
 async function getBarbershop(slug: string): Promise<Barbershop> {
-  const h = headers();
+  const h = await headers(); // <- await aqui
   const tenantId = h.get("x-tenant-id");
   if (!tenantId) throw new Error("Missing X-Tenant-Id");
 
@@ -20,7 +20,7 @@ export default async function Page({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params; // <- aguarda o Promise
+  const { slug } = await params; // <- params é Promise no seu projeto
   const data = await getBarbershop(slug);
 
   return (
