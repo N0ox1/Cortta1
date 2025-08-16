@@ -7,8 +7,12 @@ async function getBarbershop(slug: string): Promise<Barbershop> {
   const tenantId = h.get("x-tenant-id");
   if (!tenantId) throw new Error("Missing X-Tenant-Id");
 
-  // usar caminho relativo para este mesmo deploy
-  const res = await fetch(`/api/barbershop/public/${slug}`, {
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  if (!host) throw new Error("Missing host headers");
+  const base = `${proto}://${host}`;
+
+  const res = await fetch(`${base}/api/barbershop/public/${slug}`, {
     headers: { "X-Tenant-Id": tenantId },
     next: { revalidate: 60 },
   });
