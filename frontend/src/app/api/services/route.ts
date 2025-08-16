@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   if (!shop) return NextResponse.json({ services: [] }, { headers: { "cache-control": "s-maxage=30, stale-while-revalidate=60" } });
 
   const services = await prisma.service.findMany({
-    where: { tenantId, barbershopId: shop.id, isActive: true },
+    where: { barbershopId: shop.id, isActive: true },
     orderBy: { name: "asc" },
     select: { id: true, name: true, durationMin: true, priceCents: true },
     take: 100,
@@ -36,7 +36,13 @@ export async function POST(req: NextRequest) {
   if (!shop) return NextResponse.json({ error: "barbearia não encontrada" }, { status: 404 });
 
   const svc = await prisma.service.create({
-    data: { tenantId, barbershopId: shop.id, name, durationMin, priceCents, isActive },
+    data: {
+      barbershopId: shop.id,
+      name,
+      durationMin,
+      priceCents,
+      isActive,
+    },
     select: { id: true },
   });
 
