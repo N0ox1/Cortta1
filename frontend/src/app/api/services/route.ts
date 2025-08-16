@@ -1,5 +1,5 @@
-Ôªøimport { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/src/lib/db";
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
 import { z } from "zod";
 
 export const runtime = "nodejs";
@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   const tenantId = req.headers.get("x-tenant-id");
   if (!tenantId) return NextResponse.json({ error: "X-Tenant-Id requerido" }, { status: 400 });
   const parsed = Query.safeParse({ slug: new URL(req.url).searchParams.get("slug") ?? "" });
-  if (!parsed.success) return NextResponse.json({ error: "slug inv√°lido" }, { status: 400 });
+  if (!parsed.success) return NextResponse.json({ error: "slug inv·lido" }, { status: 400 });
 
   const shop = await prisma.barbershop.findFirst({
     where: { tenantId, slug: parsed.data.slug, isActive: true },
@@ -42,13 +42,13 @@ export async function POST(req: NextRequest) {
   });
 
   const parsed = Body.safeParse(await req.json());
-  if (!parsed.success) return NextResponse.json({ error: "payload inv√°lido" }, { status:400 });
+  if (!parsed.success) return NextResponse.json({ error: "payload inv·lido" }, { status:400 });
 
   const shop = await prisma.barbershop.findFirst({
     where: { tenantId, slug: parsed.data.slug, isActive: true },
     select: { id: true },
   });
-  if (!shop) return NextResponse.json({ error: "barbearia n√£o encontrada" }, { status: 404 });
+  if (!shop) return NextResponse.json({ error: "barbearia n„o encontrada" }, { status: 404 });
 
   const svc = await prisma.service.create({
     data: {
